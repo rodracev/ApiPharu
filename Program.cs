@@ -1,4 +1,12 @@
+using System.Text;
+using ApiPharu.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<Bc365>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Bc365ConnectionString")));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
