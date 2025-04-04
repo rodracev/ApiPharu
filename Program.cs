@@ -5,8 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers(); // Esto es necesario para los controladores
 builder.Services.AddDbContext<Bc365>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("Bc365ConnectionString")));
+builder.Services.AddDbContext<Maximo>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MaximoConnectionString")));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -22,13 +25,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
-
+app.MapControllers();  
 app.MapGet("/", () =>
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
