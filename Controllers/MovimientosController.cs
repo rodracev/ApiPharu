@@ -22,63 +22,78 @@ namespace ApiPharu.Controllers
              _context = context;
              _mcontext = mcontext;
         }
-          [HttpGet("Todos")]
-       public async Task<IActionResult> ObtenerMovimientos()
+         [HttpGet("fecha")]
+        public async Task<IActionResult> ObtenerMovimientosPorRangoFecha([FromQuery] string startDate, [FromQuery] string endDate)
         {
-            // Realizar la consulta LINQ equivalente a la SQL que enviaste
-          // Obtener los datos de PharuMovs desde _context
-var movimientos = await _context.PharuMovs.AsNoTracking().ToListAsync();
+            if (DateTime.TryParse(startDate, out var parsedStartDate) && DateTime.TryParse(endDate, out var parsedEndDate))
+            {
+                if (parsedStartDate > parsedEndDate)
+                {
+                    return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+                }
 
-// Obtener los datos de WorkOrders y MeterReadings desde _mcontext
-var workOrders = await _mcontext.WorkOrders.AsNoTracking().Where(w => w.Woclass == "WORKORDER")
-.ToListAsync();
-var meterReadings = await _mcontext.MeterReadings.AsNoTracking().ToListAsync();
+                var movimientos = await _context.PharuMovs
+                    .AsNoTracking()
+                    .Where(m => m.Fecha >= parsedStartDate && m.Fecha <= parsedEndDate)
+                    .ToListAsync();
+                return Ok(movimientos);
+            }
+            else
+            {
+                return BadRequest("Las fechas proporcionadas no son válidas.");
+            }
+        }
+         [HttpGet("articulo/{invtID}")]
+        public async Task<IActionResult> ObtenerMovimientosPorArticulos(string invtID,[FromQuery] string startDate, [FromQuery] string endDate)
+        {
+            if (DateTime.TryParse(startDate, out var parsedStartDate) && DateTime.TryParse(endDate, out var parsedEndDate))
+            {
+                if (parsedStartDate > parsedEndDate)
+                {
+                    return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+                }
+                var Movarticulos = await _context.PharuMovs
+                                            .Where(a => a.Articulo == invtID &&  a.Fecha >= parsedStartDate && a.Fecha <= parsedEndDate)
+                                            .ToListAsync();
 
-// Unir los datos en memoria
-var query = (from a in movimientos
-             join e in workOrders on a.OT_MAXIMO equals e.Wonum
-             select new
-             {
-                 a.Periodo,
-                 a.Movimiento,
-                 a.TipodeSalida,
-                 a.Bodega,
-                 a.Localizacion,
-                 a.Clase,
-                 Articulo = a.Articulo.Replace("\t", ""),
-                 Descripcion = a.Descripcion.Replace("\t", ""),
-                 a.UM,
-                 a.Cantidad,
-                 a.Fecha,
-                 a.FechaAfectacion,
-                 a.Anio,
-                 a.Lote,
-                 a.Referencia,
-                 a.CuentaCosto,
-                 a.EntidadCosto,
-                 a.CuentaInventario,
-                 a.EntidadInventario,
-                 a.Proyecto,
-                 a.Actividad,
-                 a.CargoA,
-                 a.OT_MAXIMO,
-                 a.Equipo,
-                 a.CostoUnit,
-                 a.CostoExtendido,
-                 a.RUTEmpleado,
-                 a.UUsuaria,
-                 a.Usuario,
-                 a.OC,
-                 Horo = (from m in meterReadings
-                         where m.AssetNum == e.AssetNum &&
-                               Math.Abs((a.Fecha - m.EnterDate).Days) == 
-                               meterReadings.Where(mm => mm.AssetNum == e.AssetNum)
-                                            .Min(mm => Math.Abs((a.Fecha - mm.EnterDate).Days))
-                         select m.Reading).FirstOrDefault(),
-                 e.WorkType
-             }).ToList();
+                if (Movarticulos == null)
+                {
+                    return NotFound(); // Devuelve 404 si no se encuentra el artículo
+                }
 
-            return Ok(query);
+                return Ok(Movarticulos); // Devuelve el artículo si se encuentra
+            }
+            else
+            {
+                return BadRequest("Las fechas proporcionadas no son válidas.");
+            }
+            
+        }
+
+         [HttpGet("bodega/{Bodega}")]
+        public async Task<IActionResult> ObtenerMovimientosPorBodega(string Bodega,[FromQuery] string startDate, [FromQuery] string endDate)
+        {
+            if (DateTime.TryParse(startDate, out var parsedStartDate) && DateTime.TryParse(endDate, out var parsedEndDate))
+            {
+                if (parsedStartDate > parsedEndDate)
+                {
+                    return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+                }
+                var Movarticulos = await _context.PharuMovs
+                                            .Where(a => a.Bodega == Bodega &&  a.Fecha >= parsedStartDate && a.Fecha <= parsedEndDate)
+                                            .ToListAsync();
+                if (Movarticulos == null)
+                {
+                    return NotFound(); // Devuelve 404 si no se encuentra el artículo
+                }
+                return Ok(Movarticulos); // Devuelve el artículo si se encuentra
+            }
+            else
+            {
+                return BadRequest("Las fechas proporcionadas no son válidas.");
+            }
+
+            
         }
         
     }

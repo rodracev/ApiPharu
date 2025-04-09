@@ -18,6 +18,9 @@ namespace ApiPharu.Controllers
         {
              _context = context;
         }
+
+
+       
         [HttpGet("Todos")]
         public async Task<IActionResult> ObtenerArticulosPaginados([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100)
         {
@@ -67,6 +70,36 @@ namespace ApiPharu.Controllers
             var articulo = await _context.PharuInvs
                                       .Where(a => a.SiteID == siteID)
                                       .ToListAsync();
+
+        if (articulo == null || articulo.Count == 0)
+        {
+            return NotFound(); // Devuelve 404 si no se encuentran artículos
+        }
+
+            return Ok(articulo); // Devuelve el artículo si se encuentra
+        }
+          [HttpGet("repuestos")]
+        public async Task<IActionResult> ObtenerRepuesto()
+        {
+            // Busca el artículo por el ID proporcionado
+            var articulo = await _context.Inventorys
+                                    .Where(a =>  EF.Functions.Like(a.Classid, "%REPUESTO%"))
+                                    .ToListAsync();
+
+        if (articulo == null || articulo.Count == 0)
+        {
+            return NotFound(); // Devuelve 404 si no se encuentran artículos
+        }
+
+            return Ok(articulo); // Devuelve el artículo si se encuentra
+        }
+         [HttpGet("repuestosfecha")]
+        public async Task<IActionResult> ObtenerRepuestofecha([FromQuery] DateTime fechaDesde, [FromQuery] DateTime fechaHasta)
+        {
+            // Busca el artículo por el ID proporcionado
+            var articulo = await _context.Inventorys
+                                    .Where(a =>  EF.Functions.Like(a.Classid, "%REPUESTO%") && a.Last_Date_Modified >=fechaDesde && a.Last_Date_Modified <= fechaHasta)
+                                    .ToListAsync();
 
         if (articulo == null || articulo.Count == 0)
         {

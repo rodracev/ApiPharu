@@ -12,8 +12,9 @@ namespace ApiPharu.Model
     {
         [Key]
         public string Wonum { get; set; }
-        public string WorkType { get; set; }
-        public string AssetNum { get; set; }
-        public string Woclass { get; set; }
+        public string? WorkType { get; set; }
+        public string? AssetNum { get; set; }
+        public string? Woclass { get; set; }
+        public DateTime changedate { get; set; }
     }
 }

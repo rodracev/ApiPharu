@@ -10,7 +10,7 @@ namespace ApiPharu.Model
        [Table("meterreading", Schema = "dbo")]
     public class MeterReading
     {
-        public int MeterReadingId { get; set; }
+        public long MeterReadingId { get; set; }
         public string AssetNum { get; set; }
         public DateTime EnterDate { get; set; }
         public decimal Reading { get; set; }
