@@ -10,6 +10,8 @@ builder.Services.AddDbContext<Bc365>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Bc365ConnectionString")));
 builder.Services.AddDbContext<Maximo>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("MaximoConnectionString")));
+builder.Services.AddDbContext<Payroll>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PayrollConnection")));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
